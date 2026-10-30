@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Otomachine Engine Creator</string>
+    <string name="title_activity_main">Otomachine Engine Creator</string>
+    <string name="package_name">com.otomachine.enginecreator</string>
+    <string name="custom_url_scheme">com.otomachine.enginecreator</string>
+</resources>
