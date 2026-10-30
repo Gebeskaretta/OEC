@@ -11,8 +11,11 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build-android-apk:
+  build:
     name: Android APK Derle (v1.1)
     runs-on: ubuntu-latest
 
@@ -20,7 +23,7 @@ jobs:
       - name: Depoyu Klonla
         uses: actions/checkout@v4
 
-      - name: Node.js Ortamini Kur (v20)
+      - name: Node.js Kur (v20)
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -30,56 +33,52 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Android SDK Ayarla
-        uses: android-actions/setup-android@v3
-
-      - name: Bagimliliklari Yukle
+      - name: NPM Paketlerini Yukle
         run: npm install --legacy-peer-deps
 
-      - name: TypeScript & Kod Kontrolu
+      - name: TypeScript Kontrolu
         run: npm run lint
 
-      - name: Web Uygulamasini Derle (dist)
+      - name: Web Uygulamasini Derle
         run: npm run build
 
-      - name: Capacitor Android Projesini Olustur
-        run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
-          npx cap sync android
-
-      - name: Zorunlu Yatay (Landscape) Ekran Ayari
-        run: |
-          MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
-          if [ -f "$MANIFEST_FILE" ]; then
-            sed -i 's/<activity/<activity android:screenOrientation="sensorLandscape"/' "$MANIFEST_FILE"
-          fi
+      - name: Capacitor Android Senkronizasyonu
+        run: npx cap sync android
 
       - name: Gradle Calistirma Izni Ver
         run: chmod +x android/gradlew
 
-      - name: Gradle ile Debug APK Derle
-        run: |
-          cd android
-          ./gradlew assembleDebug --no-daemon
+      - name: Android Debug APK Derle (Gradle)
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
 
-      - name: Derlenen APK Dosyasini Hazirla
+      - name: APK Dosyasini Hazirla
         run: |
           mkdir -p build-output
-          APK_FILE=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -n 1)
-          if [ -f "$APK_FILE" ]; then
-            cp "$APK_FILE" build-output/Otomachine-Engine-Creator-v1.1-debug.apk
-            echo "APK basariyla olusturuldu: $APK_FILE"
+          if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp android/app/build/outputs/apk/debug/app-debug.apk build-output/Otomachine-Engine-Creator-v1.1.apk
           else
-            echo "HATA: APK dosyasi bulunamadi!"
-            exit 1
+            # Alternatif cikis konumu aramasi
+            APK_FOUND=$(find android/app/build/outputs/apk/ -name "*.apk" | head -n 1)
+            cp "$APK_FOUND" build-output/Otomachine-Engine-Creator-v1.1.apk
           fi
 
       - name: APK Dosyasini Yukle (GitHub Artifact)
         uses: actions/upload-artifact@v4
         with:
           name: Otomachine-Engine-Creator-v1.1-APK
-          path: build-output/Otomachine-Engine-Creator-v1.1-debug.apk
+          path: build-output/Otomachine-Engine-Creator-v1.1.apk
           retention-days: 14
+
+      - name: GitHub Release'e APK Ekle (Direkt Indirme)
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: v1.1
+          name: "Otomachine Engine Creator v1.1 APK"
+          body: "Otomatik derlenmis Android APK dosyasidir. Android telefonunuza dogrudan indirip kurabilirsiniz."
+          files: build-output/Otomachine-Engine-Creator-v1.1.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
