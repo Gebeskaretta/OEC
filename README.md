@@ -1,4 +1,4 @@
-# Otomachine Engine Creator
+# Otomachine Engine Creator (v1.1)
 
 Automation tarzı 3D motor simülatörü ve tasarım oyunu. Three.js ve Capacitor ile geliştirilmiştir.
 
@@ -13,7 +13,7 @@ Bu depoda GitHub Actions entegrasyonu kurulmuştur:
    - Sağdaki **"Run workflow"** butonuna tıklayın.
 3. **APK'yı İndirme:**
    - Derleme tamamlandığında iş akışının içine girin.
-   - En alttaki **Artifacts** bölümünden **`Otomachine-Engine-Creator-Android-APK`** dosyasını indirip telefonunuza yükleyebilirsiniz.
+   - En alttaki **Artifacts** bölümünden **`Otomachine-Engine-Creator-v1.1-APK`** dosyasını indirip Android cihazınıza yükleyebilirsiniz.
 
 ---
 

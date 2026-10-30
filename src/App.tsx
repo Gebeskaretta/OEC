@@ -192,8 +192,12 @@ export default function App() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-rose-500/50 shadow" />
-            <h1 className="font-extrabold tracking-wider text-sm text-white font-mono uppercase">
-              OTOMACHINE <span className="text-rose-500 font-bold">ENGINE CREATOR</span>
+            <h1 className="font-extrabold tracking-wider text-sm text-white font-mono uppercase flex items-center gap-1.5">
+              <span>OTOMACHINE</span>
+              <span className="text-rose-500 font-bold">ENGINE CREATOR</span>
+              <span className="text-[10px] bg-rose-600/30 text-rose-400 border border-rose-500/40 rounded px-1.5 py-0.2 font-mono">
+                v1.1
+              </span>
             </h1>
           </div>
           <span className="text-slate-600">|</span>

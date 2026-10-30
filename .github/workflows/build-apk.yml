@@ -9,22 +9,21 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch: # GitHub Actions panelinden tek tıkla manuel derleme butonu
+  workflow_dispatch:
 
 jobs:
   build-android-apk:
-    name: Android APK Derle (Debug)
+    name: Android APK Derle (v1.1)
     runs-on: ubuntu-latest
 
     steps:
       - name: Depoyu Klonla
         uses: actions/checkout@v4
 
-      - name: Node.js Ortamını Kur (v20)
+      - name: Node.js Ortamini Kur (v20)
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Java JDK 17 Kur
         uses: actions/setup-java@v4
@@ -32,47 +31,55 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Android SDK Kurulumunu Doğrula
+      - name: Android SDK Ayarla
         uses: android-actions/setup-android@v3
 
-      - name: Bağımlılıkları Yükle
+      - name: Bagimliliklari Yukle
         run: npm install --legacy-peer-deps
 
-      - name: TypeScript & Kod Kontrolü (Lint)
+      - name: TypeScript & Kod Kontrolu
         run: npm run lint
 
-      - name: Web Uygulamasını Derle (Vite Build)
+      - name: Web Uygulamasini Derle (dist)
         run: npm run build
 
-      - name: Capacitor Android Projesini Oluştur ve Senkronize Et
+      - name: Capacitor Android Projesini Olustur
         run: |
-          npx cap add android || true
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
           npx cap sync android
 
-      - name: Yatay Ekran (Landscape) Modunu AndroidManifest'e Ekle
+      - name: Zorunlu Yatay (Landscape) Ekran Ayari
         run: |
-          MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
-          if [ -f "$MANIFEST_PATH" ]; then
-            # Ekranı zorunlu yatay (sensorLandscape) moduna ayarla
-            sed -i 's/<activity/<activity android:screenOrientation="sensorLandscape"/' "$MANIFEST_PATH"
+          MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST_FILE" ]; then
+            sed -i 's/<activity/<activity android:screenOrientation="sensorLandscape"/' "$MANIFEST_FILE"
           fi
 
-      - name: Gradle Wrapper İzinlerini Ayarla
+      - name: Gradle Calistirma Izni Ver
         run: chmod +x android/gradlew
 
-      - name: Android Debug APK Derle (Gradle)
+      - name: Gradle ile Debug APK Derle
         run: |
           cd android
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --no-daemon
 
-      - name: Derlenen APK Dosyasını Bul ve Yeniden Adlandır
+      - name: Derlenen APK Dosyasini Hazirla
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/debug/app-debug.apk build-output/Otomachine-Engine-Creator-Debug.apk
+          APK_FILE=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -n 1)
+          if [ -f "$APK_FILE" ]; then
+            cp "$APK_FILE" build-output/Otomachine-Engine-Creator-v1.1-debug.apk
+            echo "APK basariyla olusturuldu: $APK_FILE"
+          else
+            echo "HATA: APK dosyasi bulunamadi!"
+            exit 1
+          fi
 
-      - name: APK'yı GitHub Artifacts Olarak Yükle (İndirilebilir Yap)
+      - name: APK Dosyasini Yukle (GitHub Artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: Otomachine-Engine-Creator-Android-APK
-          path: build-output/Otomachine-Engine-Creator-Debug.apk
+          name: Otomachine-Engine-Creator-v1.1-APK
+          path: build-output/Otomachine-Engine-Creator-v1.1-debug.apk
           retention-days: 14

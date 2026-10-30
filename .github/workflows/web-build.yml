@@ -1,4 +1,4 @@
-name: Web Uygulaması Otomatik Test & Derleme
+name: Web Uygulamasi Otomatik Test & Derleme
 
 on:
   push:
@@ -13,31 +13,30 @@ on:
 
 jobs:
   build-web:
-    name: Web Dağıtımı & Test
+    name: Web Dagitimi & Test
     runs-on: ubuntu-latest
 
     steps:
       - name: Depoyu Klonla
         uses: actions/checkout@v4
 
-      - name: Node.js Ortamını Kur (v20)
+      - name: Node.js Ortamini Kur (v20)
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      - name: Paketleri Yükle
+      - name: Paketleri Yukle
         run: npm install --legacy-peer-deps
 
-      - name: TypeScript Kontrolü
+      - name: TypeScript Kontrolu
         run: npm run lint
 
-      - name: Web Uygulamasını Derle
+      - name: Web Uygulamasini Derle
         run: npm run build
 
-      - name: Web Çıktısını Yükle (Artifact)
+      - name: Web Ciktisini Yukle (Artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: Otomachine-Web-Dist
+          name: Otomachine-Web-Dist-v1.1
           path: dist/
           retention-days: 7
