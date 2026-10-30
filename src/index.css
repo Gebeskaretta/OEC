@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Prevent unwanted mobile text selection when revving gas */
+body {
+  touch-action: manipulation;
+  user-select: none;
+  background-color: #0a0d13;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}

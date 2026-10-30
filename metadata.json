@@ -1,0 +1,6 @@
+{
+  "name": "Otomachine Engine Creator",
+  "description": "Automation tarzı 3D motor simülatörü ve tasarım oyunu. Parçaları özelleştirin, dyno testine sokun, motor sesini dinleyin ve performansı artırın.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
