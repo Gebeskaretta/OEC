@@ -1,0 +1,9 @@
+{
+  "appId": "com.otomachine.enginecreator",
+  "appName": "Otomachine Engine Creator",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

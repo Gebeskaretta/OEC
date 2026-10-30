@@ -1,0 +1,78 @@
+name: Android APK Otomatik Derleme (Capacitor)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # GitHub Actions panelinden tek tıkla manuel derleme butonu
+
+jobs:
+  build-android-apk:
+    name: Android APK Derle (Debug)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu Klonla
+        uses: actions/checkout@v4
+
+      - name: Node.js Ortamını Kur (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Java JDK 17 Kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Android SDK Kurulumunu Doğrula
+        uses: android-actions/setup-android@v3
+
+      - name: Bağımlılıkları Yükle
+        run: npm install --legacy-peer-deps
+
+      - name: TypeScript & Kod Kontrolü (Lint)
+        run: npm run lint
+
+      - name: Web Uygulamasını Derle (Vite Build)
+        run: npm run build
+
+      - name: Capacitor Android Projesini Oluştur ve Senkronize Et
+        run: |
+          npx cap add android || true
+          npx cap sync android
+
+      - name: Yatay Ekran (Landscape) Modunu AndroidManifest'e Ekle
+        run: |
+          MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST_PATH" ]; then
+            # Ekranı zorunlu yatay (sensorLandscape) moduna ayarla
+            sed -i 's/<activity/<activity android:screenOrientation="sensorLandscape"/' "$MANIFEST_PATH"
+          fi
+
+      - name: Gradle Wrapper İzinlerini Ayarla
+        run: chmod +x android/gradlew
+
+      - name: Android Debug APK Derle (Gradle)
+        run: |
+          cd android
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Derlenen APK Dosyasını Bul ve Yeniden Adlandır
+        run: |
+          mkdir -p build-output
+          cp android/app/build/outputs/apk/debug/app-debug.apk build-output/Otomachine-Engine-Creator-Debug.apk
+
+      - name: APK'yı GitHub Artifacts Olarak Yükle (İndirilebilir Yap)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Otomachine-Engine-Creator-Android-APK
+          path: build-output/Otomachine-Engine-Creator-Debug.apk
+          retention-days: 14
