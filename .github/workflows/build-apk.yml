@@ -23,10 +23,10 @@ jobs:
       - name: Depoyu Klonla
         uses: actions/checkout@v4
 
-      - name: Node.js Kur (v20)
+      - name: Node.js Kur (v22 LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Java JDK 17 Kur
         uses: actions/setup-java@v4
